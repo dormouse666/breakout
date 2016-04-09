@@ -11,6 +11,8 @@
 
 #include "cocos2d.h"
 
+class Ball;
+
 class Top : public cocos2d::Layer
 {
 public:
@@ -40,7 +42,7 @@ private:
     cocos2d::Size _visibleSize;
     cocos2d::Vec2 _origin;
     cocos2d::Node* _backGround;
-    cocos2d::Sprite* _ball;
+    Ball* _ball;
 };
 
 #endif /* defined(__breakout__Top__) */

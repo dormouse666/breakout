@@ -7,6 +7,7 @@
 //
 
 #include "Top.h"
+#include "Ball.h"
 
 USING_NS_CC;
 
@@ -59,6 +60,9 @@ void Top::onEnter()
     _visibleSize = Director::getInstance()->getVisibleSize();
     _origin = Director::getInstance()->getVisibleOrigin();
     
+    CCLOG("_visibleSize: %f, %f", _visibleSize.width, _visibleSize.height);
+    CCLOG("_origin: %f, %f", _origin.x, _origin.y);
+    
     // Homeに戻るボタン
     auto closeItem = MenuItemImage::create(
                                            "CloseNormal.png",
@@ -83,7 +87,7 @@ void Top::onEnter()
         _backGround->setPosition(_origin.x + _visibleSize.width / 2, _origin.y + _visibleSize.height / 2);
         
         // 適当に色つけとく
-        auto color = LayerGradient::create(Color4B(255, 255, 255, 255), Color4B(8, 8, 8, 255), Point(1, 1));
+        auto color = LayerGradient::create(Color4B(200, 200, 200, 255), Color4B(50, 50, 50, 255), Point(1, 1));
         color->setContentSize(_backGround->getContentSize());
         _backGround->addChild(color);
         
@@ -146,10 +150,18 @@ void Top::entryBallCallback(Ref* pSender)
         return;
     }
     
-    _ball = cocos2d::Sprite::create("images/ball.png");
+    //ボール作成
+    _ball = Ball::create();
     _ball->setAnchorPoint(Point(0.5f, 0.5f));
     _ball->setPosition(_origin.x + _visibleSize.width / 2,
                        _origin.y + (_backGround->getPosition().y - _backGround->getContentSize().height / 2));
+    
+    //ボールが進む方向をランダムに入れる TODO:進む距離を一定にする
+    std::random_device rnd;
+    std::mt19937 mt(rnd());
+    std::uniform_real_distribution<> randHorizon(-1.0f, 1.1f); //memo: a以上b未満らしい
+    _ball->setVerticalLength(1.0f);
+    _ball->setHorizonLength(randHorizon(mt));
     this->addChild(_ball);
 }
 
@@ -162,23 +174,58 @@ void Top::update(float dt)
     }
     
     //上限
-    auto topPos = _origin.y + (_backGround->getPosition().y + _backGround->getContentSize().height / 2);
+    auto topPos = _backGround->getPosition().y + _backGround->getContentSize().height/2 - _ball->getContentSize().height/2;
     //下限
-    auto underPos = _origin.y + (_backGround->getPosition().y - _backGround->getContentSize().height / 2);
-    //左限
-    //右限
+    auto underPos = _backGround->getPosition().y - _backGround->getContentSize().height/2  + _ball->getContentSize().height/2;
+    //右限
+    auto rightPos = _backGround->getPosition().x + _backGround->getContentSize().width/2  - _ball->getContentSize().width/2;
+    //左限
+    auto leftPos = _backGround->getPosition().x - _backGround->getContentSize().width/2 + _ball->getContentSize().width/2;
+    
+    CCLOG("rightPos: %f", rightPos);
+    CCLOG("leftPos: %f", leftPos);
     
     //動かす
-    _ball->setPosition(_ball->getPosition().x,
-                        _ball->getPosition().y + 1);
+    _ball->setPosition(_ball->getPosition().x + _ball->getHorizonLength(),
+                        _ball->getPosition().y + _ball->getVerticalLength());
     
     //上にぶつかった時
     if(_ball->getPosition().y >= topPos)
     {
-        //TODO: ボールの状態を変える class化
-
-        //とりえず消しとく
-        _ball->removeFromParent();
-        _ball = nullptr;
+        //上に進んでるなら下向きに
+        if(_ball->getVerticalLength() > 0)
+        {
+            _ball->setVerticalLength(-(_ball->getVerticalLength()));
+        }
+    }
+    
+    //下にぶつかった時
+    if(_ball->getPosition().y <= underPos)
+    {
+        //下に進んでるなら上向きに
+        if(_ball->getVerticalLength() < 0)
+        {
+            _ball->setVerticalLength(-(_ball->getVerticalLength()));
+        }
+    }
+    
+    //右にぶつかった時
+    if(_ball->getPosition().x >= rightPos)
+    {
+        //右に進んでるなら左向きに
+        if(_ball->getHorizonLength() > 0)
+        {
+            _ball->setHorizonLength(-(_ball->getHorizonLength()));
+        }
+    }
+    
+    //左にぶつかった時
+    if(_ball->getPosition().x <= leftPos)
+    {
+        //左に進んでるなら右向きに
+        if(_ball->getHorizonLength() < 0)
+        {
+            _ball->setHorizonLength(-(_ball->getHorizonLength()));
+        }
     }
 }
