@@ -16,6 +16,13 @@ class Ball;
 class Top : public cocos2d::Layer
 {
 public:
+    //仮
+    enum State {
+        NOMAL,   //通常
+        PLAYING, //ボールがある状態
+    };
+    
+public:
     static cocos2d::Scene* createScene();
     
     virtual bool init();
@@ -37,6 +44,8 @@ public:
     void entryBallCallback(cocos2d::Ref* pSender);
     
     void update(float dt);
+    
+    State _state;
     
 private:
     cocos2d::Size _visibleSize;

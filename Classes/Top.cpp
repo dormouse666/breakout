@@ -9,7 +9,12 @@
 #include "Top.h"
 #include "Ball.h"
 
+#include <math.h>
+
 USING_NS_CC;
+
+static const double PI = 3.141592653589793;
+static const int LENGTH = 2;
 
 // コンストラクタ
 Top::Top()
@@ -17,6 +22,7 @@ Top::Top()
 , _origin(0,0)
 , _backGround(nullptr)
 , _ball(nullptr)
+, _state(NOMAL)
 {
 }
 
@@ -145,24 +151,54 @@ void Top::entryBall()
 //ボール発射ボタン
 void Top::entryBallCallback(Ref* pSender)
 {
-    if(_ball)
-    {
-        return;
+    switch (_state) {
+        case NOMAL:
+        {
+            if(_ball)
+            {
+                return;
+            }
+            
+            //ボール作成
+            _ball = Ball::create();
+            _ball->setAnchorPoint(Point(0.5f, 0.5f));
+            _ball->setPosition(_origin.x + _visibleSize.width / 2,
+                               _origin.y + (_backGround->getPosition().y - _backGround->getContentSize().height / 2));
+
+            
+            //進む距離
+            int length = LENGTH;
+            
+            //角度をランダムに
+            std::random_device rnd;
+            std::mt19937 mt(rnd());
+            std::uniform_real_distribution<double> randDegree(-89.0, 90.0); //memo: a以上b未満らしい
+            double radian = randDegree(mt) * PI / 180.0; //ラジアン
+            
+            //x,y
+            _ball->setVerticalLength(cos(radian)*length);
+            _ball->setHorizonLength(sin(radian)*length);
+            
+            this->addChild(_ball);
+            
+            _state = PLAYING; //state戻す
+            
+            break;
+        }
+        case PLAYING:
+        {
+            //ボール消す
+            _ball->removeFromParent();
+            _ball = nullptr;
+            
+            _state = NOMAL; //state戻す
+            
+            break;
+        }
+        default:
+            break;
     }
     
-    //ボール作成
-    _ball = Ball::create();
-    _ball->setAnchorPoint(Point(0.5f, 0.5f));
-    _ball->setPosition(_origin.x + _visibleSize.width / 2,
-                       _origin.y + (_backGround->getPosition().y - _backGround->getContentSize().height / 2));
-    
-    //ボールが進む方向をランダムに入れる TODO:進む距離を一定にする
-    std::random_device rnd;
-    std::mt19937 mt(rnd());
-    std::uniform_real_distribution<> randHorizon(-1.0f, 1.1f); //memo: a以上b未満らしい
-    _ball->setVerticalLength(1.0f);
-    _ball->setHorizonLength(randHorizon(mt));
-    this->addChild(_ball);
 }
 
 //update
