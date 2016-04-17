@@ -44,6 +44,15 @@ public:
     void entryBallCallback(cocos2d::Ref* pSender);
     
     void update(float dt);
+    
+    //player
+    bool onTouchBegan(cocos2d::Touch* touch, cocos2d::Event* event);
+    void onTouchMoved(cocos2d::Touch* touch, cocos2d::Event* event);
+    void onTouchEnded(cocos2d::Touch* touch, cocos2d::Event* event);
+    //void onTouchCancelled(cocos2d::Touch* touch, cocos2d::Event* event);
+    
+    void setPlayer();
+    bool isPlayerTapped(cocos2d::Vec2 pos);
 
 public:
     //角度A〜Bまでの間でボールの進む距離をランダムでセット
@@ -55,6 +64,8 @@ private:
     cocos2d::Vec2 _origin;
     cocos2d::Node* _backGround;
     Ball* _ball;
+    cocos2d::Sprite* _player;
+    bool _isPlayerTap;
 };
 
 #endif /* defined(__breakout__Top__) */

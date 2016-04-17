@@ -23,6 +23,8 @@ Top::Top()
 , _backGround(nullptr)
 , _ball(nullptr)
 , _state(NOMAL)
+, _player(nullptr)
+, _isPlayerTap(false)
 {
 }
 
@@ -103,7 +105,10 @@ void Top::onEnter()
         this->addChild(_backGround);
     }
     
-    //entryBall
+    //player
+    this->setPlayer();
+    
+    //entryBallボタンセット
     this->entryBall();
     
     //update
@@ -123,6 +128,33 @@ void Top::menuCloseCallback(Ref* pSender)
 #if (CC_TARGET_PLATFORM == CC_PLATFORM_IOS)
     exit(0);
 #endif
+}
+
+//プレイヤー
+void Top::setPlayer()
+{
+    if(_player)
+    {
+        return;
+    }
+    
+    _player = Sprite::create("images/player.png");
+    _player->setPosition(_origin.x + _visibleSize.width / 2,
+                         _origin.y + (_backGround->getPosition().y - _backGround->getContentSize().height / 2));
+    this->addChild(_player);
+    
+    //EventListener作成
+    auto listener = EventListenerTouchOneByOne::create();
+    
+    //メソッドの設定
+    listener->onTouchBegan = CC_CALLBACK_2(Top::onTouchBegan, this);
+    listener->onTouchMoved = CC_CALLBACK_2(Top::onTouchMoved, this);
+    listener->onTouchEnded = CC_CALLBACK_2(Top::onTouchEnded, this);
+    listener->onTouchCancelled = CC_CALLBACK_2(Top::onTouchCancelled, this);
+    
+    //dispatcherに登録
+    auto dispatcher = Director::getInstance()->getEventDispatcher();
+    dispatcher->addEventListenerWithSceneGraphPriority(listener, this);
 }
 
 //ボール発射ボタン
@@ -295,4 +327,77 @@ void Top::update(float dt)
             _ball->setHorizonLength(-(_ball->getHorizonLength()));
         }
     }
+}
+
+//playerをタップしてるかどうか
+bool Top::isPlayerTapped(cocos2d::Vec2 tapPos)
+{
+    if(!_player)
+    {
+        return false;
+    }
+    
+    auto playerPos = _player->getParent()->convertToWorldSpace(_player->getPosition());
+    auto right = playerPos.x + _player->getContentSize().width/2; //右
+    auto left = playerPos.x - _player->getContentSize().width/2; //左
+    auto top = playerPos.y + _player->getContentSize().height/2; //上
+    auto under = playerPos.y - _player->getContentSize().height/2; //下
+    if(right >= tapPos.x && left <= tapPos.x && top >= tapPos.y && under <= tapPos.y)
+    {
+        return true;
+    }
+    
+    return false;
+}
+
+//player
+bool Top::onTouchBegan(cocos2d::Touch* touch, cocos2d::Event* event)
+{
+    if(!_player)
+    {
+        return false;
+    }
+    
+    auto location = touch->getLocation();
+
+    if(isPlayerTapped(location))
+    {
+        _isPlayerTap = true;
+        return true;
+    }
+    
+    return false;
+}
+
+//player
+void Top::onTouchMoved(cocos2d::Touch* touch, cocos2d::Event* event)
+{
+    if(!_player)
+    {
+        return;
+    }
+    
+    //タップ位置
+    auto location = touch->getLocation();
+    
+    //右限
+    auto rightPos = _backGround->getPosition().x + _backGround->getContentSize().width/2  - _player->getContentSize().width/2;
+    //左限
+    auto leftPos = _backGround->getPosition().x - _backGround->getContentSize().width/2 + _player->getContentSize().width/2;
+    
+    if(_isPlayerTap && rightPos > location.x && leftPos < location.x)
+    {
+        _player->setPositionX(location.x); //yは変更しない
+    }
+}
+
+//player
+void Top::onTouchEnded(cocos2d::Touch *touch, cocos2d::Event *event)
+{
+    if(!_player)
+    {
+        return;
+    }
+    
+    _isPlayerTap = false;
 }
