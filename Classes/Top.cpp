@@ -255,11 +255,19 @@ void Top::update(float dt)
         //ボールの位置を調整
         _ball->setPositionY(underPos);
         
+        /*
         //下に進んでるなら上向きに
         if(_ball->getVerticalLength() < 0)
         {
             _ball->setVerticalLength(-(_ball->getVerticalLength()));
         }
+         */
+        
+        //ボール消す
+        _ball->removeFromParent();
+        _ball = nullptr;
+        _state = NOMAL; //state戻す
+        return;
     }
     
     //右にぶつかった時
