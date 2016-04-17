@@ -44,10 +44,13 @@ public:
     void entryBallCallback(cocos2d::Ref* pSender);
     
     void update(float dt);
-    
-    State _state;
-    
+
+public:
+    //角度A〜Bまでの間でボールの進む距離をランダムでセット
+    void setBallLengthRandom(double degreeA, double degreeB);
+
 private:
+    State _state;
     cocos2d::Size _visibleSize;
     cocos2d::Vec2 _origin;
     cocos2d::Node* _backGround;

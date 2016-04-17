@@ -164,20 +164,9 @@ void Top::entryBallCallback(Ref* pSender)
             _ball->setAnchorPoint(Point(0.5f, 0.5f));
             _ball->setPosition(_origin.x + _visibleSize.width / 2,
                                _origin.y + (_backGround->getPosition().y - _backGround->getContentSize().height / 2));
-
             
-            //進む距離
-            int length = LENGTH;
-            
-            //角度をランダムに
-            std::random_device rnd;
-            std::mt19937 mt(rnd());
-            std::uniform_real_distribution<double> randDegree(-89.0, 90.0); //memo: a以上b未満らしい
-            double radian = randDegree(mt) * PI / 180.0; //ラジアン
-            
-            //x,y
-            _ball->setVerticalLength(cos(radian)*length);
-            _ball->setHorizonLength(sin(radian)*length);
+            //角度と進む距離セット
+            setBallLengthRandom(-89.0, 90.0);
             
             this->addChild(_ball);
             
@@ -199,6 +188,28 @@ void Top::entryBallCallback(Ref* pSender)
             break;
     }
     
+}
+
+//角度1〜2までの間でボールの進む距離をランダムでセット
+void Top::setBallLengthRandom(double degreeA, double degreeB)
+{
+    if(!_ball)
+    {
+        return;
+    }
+    
+    //進む距離
+    int length = LENGTH;
+    
+    //角度をランダムに
+    std::random_device rnd;
+    std::mt19937 mt(rnd());
+    std::uniform_real_distribution<double> randDegree(degreeA, degreeB); //memo: a以上b未満らしい
+    double radian = randDegree(mt) * PI / 180.0; //ラジアン
+    
+    //x,y セット
+    _ball->setVerticalLength(cos(radian)*length);
+    _ball->setHorizonLength(sin(radian)*length);
 }
 
 //update
@@ -228,6 +239,8 @@ void Top::update(float dt)
     //上にぶつかった時
     if(_ball->getPosition().y >= topPos)
     {
+        //ボールの位置を調整
+        
         //上に進んでるなら下向きに
         if(_ball->getVerticalLength() > 0)
         {
