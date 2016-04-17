@@ -14,7 +14,8 @@
 USING_NS_CC;
 
 static const double PI = 3.141592653589793;
-static const int LENGTH = 2;
+static const int LENGTH = 1;
+static const char* PLAYER_IMG_NAME = "images/player.png";
 
 // コンストラクタ
 Top::Top()
@@ -128,33 +129,6 @@ void Top::menuCloseCallback(Ref* pSender)
 #if (CC_TARGET_PLATFORM == CC_PLATFORM_IOS)
     exit(0);
 #endif
-}
-
-//プレイヤー
-void Top::setPlayer()
-{
-    if(_player)
-    {
-        return;
-    }
-    
-    _player = Sprite::create("images/player.png");
-    _player->setPosition(_origin.x + _visibleSize.width / 2,
-                         _origin.y + (_backGround->getPosition().y - _backGround->getContentSize().height / 2));
-    this->addChild(_player);
-    
-    //EventListener作成
-    auto listener = EventListenerTouchOneByOne::create();
-    
-    //メソッドの設定
-    listener->onTouchBegan = CC_CALLBACK_2(Top::onTouchBegan, this);
-    listener->onTouchMoved = CC_CALLBACK_2(Top::onTouchMoved, this);
-    listener->onTouchEnded = CC_CALLBACK_2(Top::onTouchEnded, this);
-    listener->onTouchCancelled = CC_CALLBACK_2(Top::onTouchCancelled, this);
-    
-    //dispatcherに登録
-    auto dispatcher = Director::getInstance()->getEventDispatcher();
-    dispatcher->addEventListenerWithSceneGraphPriority(listener, this);
 }
 
 //ボール発射ボタン
@@ -287,19 +261,26 @@ void Top::update(float dt)
         //ボールの位置を調整
         _ball->setPositionY(underPos);
         
-        /*
-        //下に進んでるなら上向きに
-        if(_ball->getVerticalLength() < 0)
+        //playerに当たったら跳ね返す
+        auto playerPos = _player->getParent()->convertToWorldSpace(_player->getPosition());
+        auto right = playerPos.x + _player->getContentSize().width/2;  //右
+        auto left = playerPos.x - _player->getContentSize().width/2;   //左
+        if(right >= _ball->getPosition().x && left <= _ball->getPosition().x)
         {
-            _ball->setVerticalLength(-(_ball->getVerticalLength()));
+            //下に進んでるなら上向きに
+            if(_ball->getVerticalLength() < 0)
+            {
+                _ball->setVerticalLength(-(_ball->getVerticalLength()));
+            }
         }
-         */
-        
-        //ボール消す
-        _ball->removeFromParent();
-        _ball = nullptr;
-        _state = NOMAL; //state戻す
-        return;
+        else
+        {
+            //ボール消す
+            _ball->removeFromParent();
+            _ball = nullptr;
+            _state = NOMAL; //state戻す
+            return;
+        }
     }
     
     //右にぶつかった時
@@ -329,6 +310,34 @@ void Top::update(float dt)
     }
 }
 
+//プレイヤー
+void Top::setPlayer()
+{
+    if(_player)
+    {
+        return;
+    }
+    
+    _player = Sprite::create(PLAYER_IMG_NAME);
+    _player->setPosition(_origin.x + _visibleSize.width / 2,
+                         _origin.y + (_backGround->getPosition().y - _backGround->getContentSize().height / 2));
+    _player->setAnchorPoint(Point(0.5f, 1.0f)); //上に合わせる
+    this->addChild(_player);
+    
+    //EventListener作成
+    auto listener = EventListenerTouchOneByOne::create();
+    
+    //メソッドの設定
+    listener->onTouchBegan = CC_CALLBACK_2(Top::onTouchBegan, this);
+    listener->onTouchMoved = CC_CALLBACK_2(Top::onTouchMoved, this);
+    listener->onTouchEnded = CC_CALLBACK_2(Top::onTouchEnded, this);
+    listener->onTouchCancelled = CC_CALLBACK_2(Top::onTouchCancelled, this);
+    
+    //dispatcherに登録
+    auto dispatcher = Director::getInstance()->getEventDispatcher();
+    dispatcher->addEventListenerWithSceneGraphPriority(listener, this);
+}
+
 //playerをタップしてるかどうか
 bool Top::isPlayerTapped(cocos2d::Vec2 tapPos)
 {
@@ -338,10 +347,10 @@ bool Top::isPlayerTapped(cocos2d::Vec2 tapPos)
     }
     
     auto playerPos = _player->getParent()->convertToWorldSpace(_player->getPosition());
-    auto right = playerPos.x + _player->getContentSize().width/2; //右
-    auto left = playerPos.x - _player->getContentSize().width/2; //左
-    auto top = playerPos.y + _player->getContentSize().height/2; //上
-    auto under = playerPos.y - _player->getContentSize().height/2; //下
+    auto right = playerPos.x + _player->getContentSize().width/2;  //右
+    auto left = playerPos.x - _player->getContentSize().width/2;   //左
+    auto top = playerPos.y;                                        //上
+    auto under = playerPos.y - _player->getContentSize().height;   //下
     if(right >= tapPos.x && left <= tapPos.x && top >= tapPos.y && under <= tapPos.y)
     {
         return true;
