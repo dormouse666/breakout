@@ -240,6 +240,7 @@ void Top::update(float dt)
     if(_ball->getPosition().y >= topPos)
     {
         //ボールの位置を調整
+        _ball->setPositionY(topPos);
         
         //上に進んでるなら下向きに
         if(_ball->getVerticalLength() > 0)
@@ -251,6 +252,9 @@ void Top::update(float dt)
     //下にぶつかった時
     if(_ball->getPosition().y <= underPos)
     {
+        //ボールの位置を調整
+        _ball->setPositionY(underPos);
+        
         //下に進んでるなら上向きに
         if(_ball->getVerticalLength() < 0)
         {
@@ -261,6 +265,9 @@ void Top::update(float dt)
     //右にぶつかった時
     if(_ball->getPosition().x >= rightPos)
     {
+        //ボールの位置を調整
+        _ball->setPositionX(rightPos);
+        
         //右に進んでるなら左向きに
         if(_ball->getHorizonLength() > 0)
         {
@@ -271,6 +278,9 @@ void Top::update(float dt)
     //左にぶつかった時
     if(_ball->getPosition().x <= leftPos)
     {
+        //ボールの位置を調整
+        _ball->setPositionX(leftPos);
+        
         //左に進んでるなら右向きに
         if(_ball->getHorizonLength() < 0)
         {
