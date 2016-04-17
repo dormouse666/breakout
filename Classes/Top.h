@@ -40,7 +40,7 @@ public:
     void onEnter() override;
     void onExit() override;
     
-    void entryBall();
+    //void entryBall();
     void entryBallCallback(cocos2d::Ref* pSender);
     
     void update(float dt);

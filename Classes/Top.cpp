@@ -109,9 +109,6 @@ void Top::onEnter()
     //player
     this->setPlayer();
     
-    //entryBallボタンセット
-    this->entryBall();
-    
     //update
     this->scheduleUpdate();
 }
@@ -131,6 +128,7 @@ void Top::menuCloseCallback(Ref* pSender)
 #endif
 }
 
+/*
 //ボール発射ボタン
 void Top::entryBall()
 {
@@ -143,18 +141,11 @@ void Top::entryBall()
     menu->setPosition(_origin.x + _visibleSize.width / 2, _origin.y + entryBallBtn->getContentSize().height);
     this->addChild(menu);
     
-    /*
-    entryBallBtn->setPosition(Vec2(origin.x + (visibleSize.width / 2) - entryBallBtn->getContentSize().width/2 ,
-                                   origin.y + entryBallBtn->getContentSize().height/2));
-    auto menu = Menu::create(entryBallBtn, NULL);
-    menu->setPosition(Vec2::ZERO);
-    this->addChild(menu);
-     */
-    
     CCLOG("menu: %f, %f", menu->getPosition().x, menu->getPosition().y);
 }
+*/
 
-//ボール発射ボタン
+//ボール発射
 void Top::entryBallCallback(Ref* pSender)
 {
     switch (_state) {
@@ -168,7 +159,7 @@ void Top::entryBallCallback(Ref* pSender)
             //ボール作成
             _ball = Ball::create();
             _ball->setAnchorPoint(Point(0.5f, 0.5f));
-            _ball->setPosition(_origin.x + _visibleSize.width / 2,
+            _ball->setPosition(_player->getPosition().x,
                                _origin.y + (_backGround->getPosition().y - _backGround->getContentSize().height / 2));
             
             //角度と進む距離セット
@@ -180,7 +171,7 @@ void Top::entryBallCallback(Ref* pSender)
             
             break;
         }
-        case PLAYING:
+        case PLAYING:  //今ここにはこない
         {
             //ボール消す
             _ball->removeFromParent();
@@ -368,10 +359,18 @@ bool Top::onTouchBegan(cocos2d::Touch* touch, cocos2d::Event* event)
     }
     
     auto location = touch->getLocation();
-
+    
     if(isPlayerTapped(location))
     {
+        //フラグ立てる
         _isPlayerTap = true;
+        
+        //ボールがなければボール出す
+        if(!_ball)
+        {
+            this->entryBallCallback(event);
+        }
+        
         return true;
     }
     
@@ -408,5 +407,6 @@ void Top::onTouchEnded(cocos2d::Touch *touch, cocos2d::Event *event)
         return;
     }
     
+    //フラグ戻す
     _isPlayerTap = false;
 }
