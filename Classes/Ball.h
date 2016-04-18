@@ -18,7 +18,7 @@ public:
     Ball();
     virtual ~Ball();
     
-    virtual bool init();
+    virtual bool init() override;
     CREATE_FUNC(Ball);
     
     virtual void onEnter() override;

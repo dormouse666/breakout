@@ -25,7 +25,7 @@ public:
 public:
     static cocos2d::Scene* createScene();
     
-    virtual bool init();
+    virtual bool init() override;
     
     // a selector callback
     void menuCloseCallback(cocos2d::Ref* pSender);
@@ -43,12 +43,12 @@ public:
     //void entryBall();
     void entryBallCallback(cocos2d::Ref* pSender);
     
-    void update(float dt);
+    void update(float dt) override;
     
     //player
-    bool onTouchBegan(cocos2d::Touch* touch, cocos2d::Event* event);
-    void onTouchMoved(cocos2d::Touch* touch, cocos2d::Event* event);
-    void onTouchEnded(cocos2d::Touch* touch, cocos2d::Event* event);
+    bool onTouchBegan(cocos2d::Touch* touch, cocos2d::Event* event) override;
+    void onTouchMoved(cocos2d::Touch* touch, cocos2d::Event* event) override;
+    void onTouchEnded(cocos2d::Touch* touch, cocos2d::Event* event) override;
     //void onTouchCancelled(cocos2d::Touch* touch, cocos2d::Event* event);
     
     void setPlayer();
