@@ -91,9 +91,9 @@ void Top::onEnter()
         CCLOG("pos: %f, %f", _backGround->getPosition().x, _backGround->getPosition().y);
         
         // 背景サイズとか
-        _backGround->setContentSize({_visibleSize.width * 0.7f, _visibleSize.height * 0.6f});
+        _backGround->setContentSize({_visibleSize.width * 0.8f, _visibleSize.height * 0.7f});
         _backGround->setAnchorPoint(Point(0.5f, 0.5f));
-        _backGround->setPosition(_origin.x + _visibleSize.width / 2, _origin.y + _visibleSize.height / 2);
+        _backGround->setPosition(_origin.x + _visibleSize.width / 2, _origin.y + _visibleSize.height * 0.55);
         
         // 適当に色つけとく
         auto color = LayerGradient::create(Color4B(200, 200, 200, 255), Color4B(50, 50, 50, 255), Point(1, 1));
