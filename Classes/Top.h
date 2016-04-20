@@ -60,12 +60,17 @@ public:
 
 private:
     State _state;
+    
     cocos2d::Size _visibleSize;
     cocos2d::Vec2 _origin;
+    
     cocos2d::Node* _backGround;
+    
     Ball* _ball;
+    
     cocos2d::Sprite* _player;
     bool _isPlayerTap;
+    cocos2d::Vec2 _firstTapPos;
 };
 
 #endif /* defined(__breakout__Top__) */

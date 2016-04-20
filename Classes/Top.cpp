@@ -26,6 +26,7 @@ Top::Top()
 , _state(NOMAL)
 , _player(nullptr)
 , _isPlayerTap(false)
+, _firstTapPos(0,0)
 {
 }
 
@@ -365,6 +366,9 @@ bool Top::onTouchBegan(cocos2d::Touch* touch, cocos2d::Event* event)
         //フラグ立てる
         _isPlayerTap = true;
         
+        //タップ位置保存
+        _firstTapPos = location;
+        
         //ボールがなければボール出す
         if(!_ball)
         {
@@ -388,14 +392,29 @@ void Top::onTouchMoved(cocos2d::Touch* touch, cocos2d::Event* event)
     //タップ位置
     auto location = touch->getLocation();
     
-    //右限
-    auto rightPos = _backGround->getPosition().x + _backGround->getContentSize().width/2  - _player->getContentSize().width/2;
-    //左限
-    auto leftPos = _backGround->getPosition().x - _backGround->getContentSize().width/2 + _player->getContentSize().width/2;
+    //移動距離
+    auto move = location - _firstTapPos;
     
-    if(_isPlayerTap && rightPos > location.x && leftPos < location.x)
+    //書き換え
+    _firstTapPos = location;
+    
+    //右限
+    auto rightPos = _backGround->getPosition().x + _backGround->getContentSize().width/2;
+    //左限
+    auto leftPos = _backGround->getPosition().x - _backGround->getContentSize().width/2;
+    
+    if(_isPlayerTap)
     {
-        _player->setPositionX(location.x); //yは変更しない
+        auto now = _player->getPosition().x + move.x;
+        if(now + _player->getContentSize().width/2 >= rightPos)
+        {
+            now = rightPos - _player->getContentSize().width/2;
+        }
+        if(now - _player->getContentSize().width/2  <= leftPos)
+        {
+            now = leftPos + _player->getContentSize().width/2;
+        }
+        _player->setPositionX(now); //yは変更しない
     }
 }
 
