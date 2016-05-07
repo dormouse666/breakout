@@ -12,6 +12,7 @@
 #include "cocos2d.h"
 
 class Ball;
+class Piece;
 
 class Top : public cocos2d::Layer
 {
@@ -53,6 +54,9 @@ public:
     
     void setPlayer();
     bool isPlayerTapped(cocos2d::Vec2 pos);
+    
+    //piece
+    void setBlock();
 
 public:
     //角度A〜Bまでの間でボールの進む距離をランダムでセット
@@ -71,6 +75,8 @@ private:
     cocos2d::Sprite* _player;
     bool _isPlayerTap;
     cocos2d::Vec2 _firstTapPos;
+    
+    Piece* _piece;
 };
 
 #endif /* defined(__breakout__Top__) */

@@ -8,7 +8,7 @@
 
 #include "Top.h"
 #include "Ball.h"
-
+#include "Piece.h"
 #include <math.h>
 
 USING_NS_CC;
@@ -27,6 +27,7 @@ Top::Top()
 , _player(nullptr)
 , _isPlayerTap(false)
 , _firstTapPos(0,0)
+, _piece(nullptr)
 {
 }
 
@@ -106,6 +107,9 @@ void Top::onEnter()
         
         this->addChild(_backGround);
     }
+    
+    //block
+    this->setBlock();
     
     //player
     this->setPlayer();
@@ -428,4 +432,21 @@ void Top::onTouchEnded(cocos2d::Touch *touch, cocos2d::Event *event)
     
     //フラグ戻す
     _isPlayerTap = false;
+}
+
+//block
+void Top::setBlock()
+{
+    if(_piece)
+    {
+        return;
+    }
+    
+    //ブロック作成
+    _piece = Piece::create();
+    _piece->setAnchorPoint(Point(0.5f, 0.5f));
+    _piece->setPosition(_origin.x + _visibleSize.width / 2,
+                        _origin.y + _visibleSize.height / 2);
+    
+    this->addChild(_piece);
 }
