@@ -77,6 +77,7 @@ private:
     cocos2d::Vec2 _firstTapPos;
     
     Piece* _piece;
+    std::vector<Piece*> _pieceMap;
 };
 
 #endif /* defined(__breakout__Top__) */

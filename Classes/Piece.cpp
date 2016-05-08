@@ -12,7 +12,8 @@ USING_NS_CC;
 
 //コンストラクタ
 Piece::Piece()
-: _piece(nullptr)
+: _pieceSpr(nullptr)
+, _colorType(RED)
 {
 }
 
@@ -37,7 +38,7 @@ void Piece::onEnter()
 {
     Node::onEnter();
     
-    setUpPiece(RED); //TODO:色をランダムに
+    //setUpPiece(_colorType); //TODO:色をランダムに
 }
 
 void Piece::onExit()
@@ -47,11 +48,13 @@ void Piece::onExit()
 
 void Piece::setUpPiece(ColorType type)
 {
+    _colorType = type; //まだ使ってないが多分どっかで使う
+    
     //前のスプライト消す
-    if(_piece)
+    if(_pieceSpr)
     {
-        _piece->removeFromParent();
-        _piece = nullptr;
+        _pieceSpr->removeFromParent();
+        _pieceSpr = nullptr;
     }
     
     //テーブル化する
@@ -68,10 +71,14 @@ void Piece::setUpPiece(ColorType type)
     }
 
     //スプライト作る
-    _piece = Sprite::create(imgPathTbl[type]);
-    if(_piece)
+    _pieceSpr = Sprite::create(imgPathTbl[type]);
+    if(_pieceSpr)
     {
-        this->addChild(_piece);
+        this->setContentSize(_pieceSpr->getContentSize()); //piece自体の大きさを合わせる
+        
+        //pieceNodeの真ん中にsprを置く
+        _pieceSpr->setAnchorPoint(Point(0.5f, 0.5f));
+        _pieceSpr->setPosition(this->getContentSize().width/2, this->getContentSize().height/2);
+        this->addChild(_pieceSpr);
     }
 }
-

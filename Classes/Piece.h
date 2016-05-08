@@ -35,7 +35,8 @@ public:
     void setUpPiece(ColorType type);
     
 private:
-    cocos2d::Sprite* _piece;
+    ColorType _colorType;
+    cocos2d::Sprite* _pieceSpr;
 };
 
 #endif /* Piece_h */

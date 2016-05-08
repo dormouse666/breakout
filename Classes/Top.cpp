@@ -29,6 +29,10 @@ Top::Top()
 , _firstTapPos(0,0)
 , _piece(nullptr)
 {
+    if(_pieceMap.size() > 0)
+    {
+        _pieceMap.clear();
+    }
 }
 
 // デストラクタ
@@ -439,14 +443,39 @@ void Top::setBlock()
 {
     if(_piece)
     {
-        return;
+        _piece = nullptr;
     }
     
-    //ブロック作成
-    _piece = Piece::create();
-    _piece->setAnchorPoint(Point(0.5f, 0.5f));
-    _piece->setPosition(_origin.x + _visibleSize.width / 2,
-                        _origin.y + _visibleSize.height / 2);
+    //ブロック作成（仮）
+    for(int i = 0; i < 16; i++)
+    {
+        _piece = Piece::create();
+        
+        Piece::ColorType type; //色変え（仮）
+        if(i % 2 == 0)
+        {
+            type = Piece::ColorType::BLUE;
+        }
+        else
+        {
+            type = Piece::ColorType::RED;
+        }
+        _piece->setUpPiece(type);
+        
+        auto pieceSize = _piece->getContentSize();
+        _piece->setPosition((_backGround->getPosition().x - _backGround->getContentSize().width / 2) + pieceSize.width * i,
+                            _origin.y + _visibleSize.height / 2); //だいぶ適当
+        
+        //マップに入れる
+        _pieceMap.push_back(_piece);
+    }
     
-    this->addChild(_piece);
+    //表示
+    if(_pieceMap.size() > 0)
+    {
+        for(auto piece : _pieceMap)
+        {
+            this->addChild(piece);
+        }
+    }
 }
