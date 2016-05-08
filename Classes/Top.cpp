@@ -28,6 +28,7 @@ Top::Top()
 , _isPlayerTap(false)
 , _firstTapPos(0,0)
 , _piece(nullptr)
+, _gameOverLabel(nullptr)
 {
     if(_pieceMap.size() > 0)
     {
@@ -153,42 +154,7 @@ void Top::menuCloseCallback(Ref* pSender)
 // リセットボタン
 void Top::menuResetCallback(Ref* pSender)
 {
-    //ブロック消す
-    if(_pieceMap.size() > 0)
-    {
-        for(auto piece : _pieceMap)
-        {
-            piece->removeFromParent();
-            piece = nullptr;
-        }
-        _pieceMap.clear();
-    }
-    
-    //ボール消す
-    if(_ball)
-    {
-        _ball->removeFromParent();
-        _ball = nullptr;
-    }
-    
-    //背景消す
-    if(_backGround)
-    {
-        _backGround->removeFromParent();
-        _backGround = nullptr;
-    }
-    
-    //player消す
-    if(_player)
-    {
-        _player->removeFromParent();
-        _player = nullptr;
-    }
-    
-    //_state戻す
-    _state = NOMAL;
-    
-    Top::onEnter();
+    this->reset();
 }
 
 /*
@@ -343,6 +309,10 @@ void Top::update(float dt)
             _ball->removeFromParent();
             _ball = nullptr;
             _state = NOMAL; //state戻す
+            
+            //ゲームオーバー
+            this->entryGameOver();
+            
             return;
         }
     }
@@ -575,4 +545,85 @@ bool Top::isCrash()
     }
     
     return false;
+}
+
+//GameOver
+void Top::entryGameOver()
+{
+    //ゲームオーバーしたよラベル生成
+    _gameOverLabel = Label::createWithSystemFont("Game Over", "HiraKakuProN-W6", 30);
+    _gameOverLabel->setPosition(Point(_origin.x + _visibleSize.width / 2, _origin.y + _visibleSize.height / 2));
+    
+    //ラベルにタッチイベント付ける
+    auto listener = EventListenerTouchOneByOne::create();
+    listener->onTouchBegan     = [this] (Touch* touch, Event* event)
+    {
+        /* ラベルタッチだけに反応させたい場合はこう
+        auto pt = _gameOverLabel->convertTouchToNodeSpace(touch);
+        auto size = _gameOverLabel->getContentSize();
+        auto boundingBox = Rect(0, 0, size.width, size.height);
+        bool onoff = boundingBox.containsPoint(pt);
+        return onoff;
+         */
+        
+        return true;
+    };
+    listener->onTouchMoved     = [ ] (Touch* touch, Event* event) {  };
+    listener->onTouchEnded     = [this] (Touch* touch, Event* event)
+    {
+        //状態リセット
+        this->reset();
+    };
+    listener->onTouchCancelled = listener->onTouchEnded;
+    this->getEventDispatcher()->addEventListenerWithSceneGraphPriority(listener, _gameOverLabel);
+    
+    //追加
+    this->addChild(_gameOverLabel);
+}
+
+//リセット
+void Top::reset()
+{
+    if(_gameOverLabel)
+    {
+        _gameOverLabel->removeFromParent();
+        _gameOverLabel = nullptr;
+    };
+    
+    //ブロック消す
+    if(_pieceMap.size() > 0)
+    {
+        for(auto piece : _pieceMap)
+        {
+            piece->removeFromParent();
+            piece = nullptr;
+        }
+        _pieceMap.clear();
+    }
+    
+    //ボール消す
+    if(_ball)
+    {
+        _ball->removeFromParent();
+        _ball = nullptr;
+    }
+    
+    //背景消す
+    if(_backGround)
+    {
+        _backGround->removeFromParent();
+        _backGround = nullptr;
+    }
+    
+    //player消す
+    if(_player)
+    {
+        _player->removeFromParent();
+        _player = nullptr;
+    }
+    
+    //_state戻す
+    _state = NOMAL;
+    
+    Top::onEnter();
 }

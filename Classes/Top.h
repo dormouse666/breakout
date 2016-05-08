@@ -43,7 +43,6 @@ public:
     
     //void entryBall();
     void entryBallCallback(cocos2d::Ref* pSender);
-    
     void menuResetCallback(cocos2d::Ref* pSender);
     
     void update(float dt) override;
@@ -59,7 +58,11 @@ public:
     
     //piece
     void setBlock();
-
+    
+    //gameOver
+    void entryGameOver();
+    void reset();
+    
 public:
     //角度A〜Bまでの間でボールの進む距離をランダムでセット
     void setBallLengthRandom(double degreeA, double degreeB);
@@ -83,6 +86,8 @@ private:
     
     Piece* _piece;
     std::vector<Piece*> _pieceMap;
+    
+    cocos2d::Label* _gameOverLabel;
 };
 
 #endif /* defined(__breakout__Top__) */
