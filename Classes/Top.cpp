@@ -78,6 +78,7 @@ void Top::onEnter()
     //CCLOG("_visibleSize: %f, %f", _visibleSize.width, _visibleSize.height);
     //CCLOG("_origin: %f, %f", _origin.x, _origin.y);
     
+    /*
     // Homeに戻るボタン
     auto closeItem = MenuItemImage::create(
                                            "CloseNormal.png",
@@ -88,6 +89,18 @@ void Top::onEnter()
     auto menu = Menu::create(closeItem, NULL);
     menu->setPosition(Vec2::ZERO);
     this->addChild(menu, 1);
+     */
+    
+    // リセットボタン
+    auto resetItem = MenuItemImage::create(
+                                           "CloseNormal.png",
+                                           "CloseSelected.png",
+                                           CC_CALLBACK_1(Top::menuResetCallback, this));
+    resetItem->setPosition(Vec2(_origin.x + _visibleSize.width - resetItem->getContentSize().width/2 ,
+                                _origin.y + resetItem->getContentSize().height/2));
+    auto resetMenu = Menu::create(resetItem, NULL);
+    resetMenu->setPosition(Vec2::ZERO);
+    this->addChild(resetMenu, 1);
     
     // 背景配置
     _backGround = Node::create();
@@ -135,6 +148,47 @@ void Top::menuCloseCallback(Ref* pSender)
 #if (CC_TARGET_PLATFORM == CC_PLATFORM_IOS)
     exit(0);
 #endif
+}
+
+// リセットボタン
+void Top::menuResetCallback(Ref* pSender)
+{
+    //ブロック消す
+    if(_pieceMap.size() > 0)
+    {
+        for(auto piece : _pieceMap)
+        {
+            piece->removeFromParent();
+            piece = nullptr;
+        }
+        _pieceMap.clear();
+    }
+    
+    //ボール消す
+    if(_ball)
+    {
+        _ball->removeFromParent();
+        _ball = nullptr;
+    }
+    
+    //背景消す
+    if(_backGround)
+    {
+        _backGround->removeFromParent();
+        _backGround = nullptr;
+    }
+    
+    //player消す
+    if(_player)
+    {
+        _player->removeFromParent();
+        _player = nullptr;
+    }
+    
+    //_state戻す
+    _state = NOMAL;
+    
+    Top::onEnter();
 }
 
 /*
@@ -457,7 +511,7 @@ void Top::setBlock()
     }
     
     //ブロック作成（仮）
-    for(int i = 0; i < 16; i++)
+    for(int i = 0; i < 15; i++)
     {
         _piece = Piece::create();
         

@@ -44,6 +44,8 @@ public:
     //void entryBall();
     void entryBallCallback(cocos2d::Ref* pSender);
     
+    void menuResetCallback(cocos2d::Ref* pSender);
+    
     void update(float dt) override;
     
     //player
