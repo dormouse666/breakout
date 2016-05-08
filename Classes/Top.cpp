@@ -75,8 +75,8 @@ void Top::onEnter()
     _visibleSize = Director::getInstance()->getVisibleSize();
     _origin = Director::getInstance()->getVisibleOrigin();
     
-    CCLOG("_visibleSize: %f, %f", _visibleSize.width, _visibleSize.height);
-    CCLOG("_origin: %f, %f", _origin.x, _origin.y);
+    //CCLOG("_visibleSize: %f, %f", _visibleSize.width, _visibleSize.height);
+    //CCLOG("_origin: %f, %f", _origin.x, _origin.y);
     
     // Homeに戻るボタン
     auto closeItem = MenuItemImage::create(
@@ -93,8 +93,8 @@ void Top::onEnter()
     _backGround = Node::create();
     if(_backGround)
     {
-        CCLOG("ancherPos: %f, %f",_backGround->getAnchorPoint().x, _backGround->getAnchorPoint().y);
-        CCLOG("pos: %f, %f", _backGround->getPosition().x, _backGround->getPosition().y);
+        //CCLOG("ancherPos: %f, %f",_backGround->getAnchorPoint().x, _backGround->getAnchorPoint().y);
+        //CCLOG("pos: %f, %f", _backGround->getPosition().x, _backGround->getPosition().y);
         
         // 背景サイズとか
         _backGround->setContentSize({_visibleSize.width * 0.8f, _visibleSize.height * 0.7f});
@@ -106,8 +106,8 @@ void Top::onEnter()
         color->setContentSize(_backGround->getContentSize());
         _backGround->addChild(color);
         
-        CCLOG("ancherPos: %f, %f",_backGround->getAnchorPoint().x, _backGround->getAnchorPoint().y);
-        CCLOG("pos: %f, %f", _backGround->getPosition().x, _backGround->getPosition().y);
+        //CCLOG("ancherPos: %f, %f",_backGround->getAnchorPoint().x, _backGround->getAnchorPoint().y);
+        //CCLOG("pos: %f, %f", _backGround->getPosition().x, _backGround->getPosition().y);
         
         this->addChild(_backGround);
     }
@@ -235,13 +235,23 @@ void Top::update(float dt)
     //左限
     auto leftPos = _backGround->getPosition().x - _backGround->getContentSize().width/2 + _ball->getContentSize().width/2;
     
-    CCLOG("rightPos: %f", rightPos);
-    CCLOG("leftPos: %f", leftPos);
+    //CCLOG("rightPos: %f", rightPos);
+    //CCLOG("leftPos: %f", leftPos);
     
     //動かす
     _ball->setPosition(_ball->getPosition().x + _ball->getHorizonLength(),
                         _ball->getPosition().y + _ball->getVerticalLength());
     
+    //pieceと衝突したかどうか
+    auto isCrash = this->isCrash();
+    
+    //衝突してたら跳ね返す（雑）
+    if(isCrash)
+    {
+        _ball->setVerticalLength(-(_ball->getVerticalLength()));
+        _ball->setHorizonLength(-(_ball->getHorizonLength()));
+    }
+
     //上にぶつかった時
     if(_ball->getPosition().y >= topPos)
     {
@@ -265,7 +275,7 @@ void Top::update(float dt)
         auto playerPos = _player->getParent()->convertToWorldSpace(_player->getPosition());
         auto right = playerPos.x + _player->getContentSize().width/2;  //右
         auto left = playerPos.x - _player->getContentSize().width/2;   //左
-        if(right >= _ball->getPosition().x && left <= _ball->getPosition().x)
+        if((right >= _ball->getPosition().x && left <= _ball->getPosition().x))
         {
             //下に進んでるなら上向きに
             if(_ball->getVerticalLength() < 0)
@@ -478,4 +488,37 @@ void Top::setBlock()
             this->addChild(piece);
         }
     }
+}
+
+//衝突したかどうか判定
+bool Top::isCrash()
+{
+    auto ballPos = _ball->getPosition(); //TODO:ballのサイズを勘案
+    
+    if(_pieceMap.size() <= 0)
+    {
+        return false;
+    }
+    
+    for(int i = 0; i < _pieceMap.size(); i++)
+    {
+        auto piecePos = _pieceMap[i]->getParent()->convertToWorldSpace(_pieceMap[i]->getPosition());
+        auto pieceSize = _pieceMap[i]->getContentSize();
+        
+        //pieceの左以上右以下かつ、下以上上以下なら衝突
+        if(ballPos.x >= piecePos.x
+           && ballPos.x <= piecePos.x + pieceSize.width
+           && ballPos.y >= piecePos.y
+           && ballPos.y <= piecePos.y + pieceSize.height)
+        {
+            _pieceMap[i]->removeFromParent();
+            _pieceMap.erase(_pieceMap.begin() + i);
+            
+            CCLOG("i = %d", i);
+            
+            return true;
+        }
+    }
+    
+    return false;
 }

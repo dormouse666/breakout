@@ -61,6 +61,9 @@ public:
 public:
     //角度A〜Bまでの間でボールの進む距離をランダムでセット
     void setBallLengthRandom(double degreeA, double degreeB);
+    
+    //衝突したかどうか判定
+    bool isCrash();
 
 private:
     State _state;
